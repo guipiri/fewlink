@@ -7,17 +7,30 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { getServerSession } from 'next-auth'
+import { prisma } from '../lib/prisma'
 
 export default async function LinkShortnerForms() {
   const session = await getServerSession()
+
   const createLink = async (formData: FormData) => {
     'use server'
-    console.log(session)
-    // const slug = formData.get('slug')?.toString()
-    // const redirectTo = formData.get('redirectTo')?.toString()
-    // if (!(slug && redirectTo)) return alert('campos vazios')
-    // await prisma.links.create({ data: { slug, redirectTo, userId: 1 } })
+    if (!session) return console.log(session)
+
+    const slug = formData.get('slug')?.toString()
+    const redirectTo = formData.get('redirectTo')?.toString()
+    if (!(slug && redirectTo)) return false
+    const user = await prisma.user.findUnique({
+      where: { email: session?.user?.email || undefined },
+    })
+    await prisma.links.create({
+      data: {
+        slug,
+        redirectTo,
+        userId: user?.id || '',
+      },
+    })
   }
+
   return (
     <form action={createLink}>
       <FormControl className="flex flex-col max-w-96">
