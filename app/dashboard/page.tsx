@@ -10,10 +10,21 @@ import {
   Tr,
 } from '@chakra-ui/react'
 import { useContext } from 'react'
-import { UserContext } from '../providers/UserProvider'
+import { FaTrash } from 'react-icons/fa'
+import { RefreshUserContext, UserContext } from '../providers/UserProvider'
 
 export default function Dashboard() {
   const user = useContext(UserContext)
+  const { refreshUser, setRefreshUser } = useContext(RefreshUserContext)
+  const deleteLink = async (linkId: string) => {
+    const res = await fetch('/api/link', {
+      body: JSON.stringify({ linkId }),
+      method: 'DELETE',
+    })
+    const json = await res.json()
+    alert(`${json.message}`)
+    setRefreshUser(!refreshUser)
+  }
   return (
     <>
       {user && (
@@ -31,16 +42,20 @@ export default function Dashboard() {
                 return (
                   <Tr key={link.id}>
                     <Td>
-                      <a
-                        href={`http://${window.location.hostname}/${link.slug}`}
-                      >
-                        http://{window.location.hostname}/{link.slug}
+                      <a href={`http://${window.location.host}/${link.slug}`}>
+                        http://{window.location.host}/{link.slug}
                       </a>
                     </Td>
                     <Td>
                       <a href={link.redirectTo}>{link.redirectTo}</a>
                     </Td>
                     <Td isNumeric>{link._count.clicks}</Td>
+                    <Td isNumeric>
+                      <FaTrash
+                        className="hover:cursor-pointer hover:fill-red-800"
+                        onClick={() => deleteLink(link.id)}
+                      />
+                    </Td>
                   </Tr>
                 )
               })}

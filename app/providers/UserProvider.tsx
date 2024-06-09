@@ -1,7 +1,14 @@
 'use client'
 import { Links, User } from '@prisma/client'
 import { useSession } from 'next-auth/react'
-import { createContext, useCallback, useEffect, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 
 interface ILinks extends Links {
   _count: { clicks: number }
@@ -12,6 +19,13 @@ interface IUser extends User {
 }
 
 export const UserContext = createContext<IUser | null>(null)
+export const RefreshUserContext = createContext<{
+  refreshUser: boolean
+  setRefreshUser: Dispatch<SetStateAction<boolean>>
+}>({
+  refreshUser: false,
+  setRefreshUser: () => {},
+})
 
 export default function UserProvider({
   children,
@@ -19,6 +33,7 @@ export default function UserProvider({
   children: React.ReactNode
 }) {
   const [user, setUser] = useState<IUser | null>(null)
+  const [refreshUser, setRefreshUser] = useState<boolean>(false)
   const { data } = useSession()
 
   const getUser = useCallback(async () => {
@@ -31,7 +46,13 @@ export default function UserProvider({
 
   useEffect(() => {
     getUser()
-  }, [getUser])
+  }, [getUser, refreshUser])
 
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>
+  return (
+    <UserContext.Provider value={user}>
+      <RefreshUserContext.Provider value={{ refreshUser, setRefreshUser }}>
+        {children}
+      </RefreshUserContext.Provider>
+    </UserContext.Provider>
+  )
 }

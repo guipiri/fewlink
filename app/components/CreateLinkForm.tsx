@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react'
 import { Links } from '@prisma/client'
 import { ChangeEvent, useContext, useState } from 'react'
-import { UserContext } from '../providers/UserProvider'
+import { RefreshUserContext, UserContext } from '../providers/UserProvider'
 import { IResponse } from '../types/IResponse'
 
 const initialStateLink: Omit<Links, 'createdAt' | 'updatedAt' | 'id'> = {
@@ -18,8 +18,9 @@ const initialStateLink: Omit<Links, 'createdAt' | 'updatedAt' | 'id'> = {
   userId: '',
 }
 
-export default function LinkShortnerForms() {
+export default function CreateLinkForm() {
   const user = useContext(UserContext)
+  const { refreshUser, setRefreshUser } = useContext(RefreshUserContext)
 
   const [link, setLink] =
     useState<Omit<Links, 'createdAt' | 'updatedAt' | 'id'>>(initialStateLink)
@@ -35,7 +36,8 @@ export default function LinkShortnerForms() {
     })
     const { message }: IResponse = await res.json()
     setLink(initialStateLink)
-    return alert(message)
+    alert(message)
+    return setRefreshUser(!refreshUser)
   }
 
   return (
