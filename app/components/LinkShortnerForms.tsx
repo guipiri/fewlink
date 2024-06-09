@@ -1,3 +1,4 @@
+'use client'
 import {
   Box,
   Button,
@@ -6,42 +7,63 @@ import {
   Input,
   Text,
 } from '@chakra-ui/react'
-import { getServerSession } from 'next-auth'
-import { prisma } from '../lib/prisma'
+import { Links } from '@prisma/client'
+import { ChangeEvent, useContext, useState } from 'react'
+import { UserContext } from '../providers/UserProvider'
+import { IResponse } from '../types/IResponse'
 
-export default async function LinkShortnerForms() {
-  const session = await getServerSession()
+const initialStateLink: Omit<Links, 'createdAt' | 'updatedAt' | 'id'> = {
+  redirectTo: '',
+  slug: '',
+  userId: '',
+}
 
-  const createLink = async (formData: FormData) => {
-    'use server'
-    if (!session) return console.log(session)
+export default function LinkShortnerForms() {
+  const user = useContext(UserContext)
 
-    const slug = formData.get('slug')?.toString()
-    const redirectTo = formData.get('redirectTo')?.toString()
-    if (!(slug && redirectTo)) return false
-    const user = await prisma.user.findUnique({
-      where: { email: session?.user?.email || undefined },
+  const [link, setLink] =
+    useState<Omit<Links, 'createdAt' | 'updatedAt' | 'id'>>(initialStateLink)
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setLink({ ...link, [e.target.name]: e.target.value })
+  }
+
+  const createLink = async () => {
+    const res = await fetch('/api/link', {
+      method: 'POST',
+      body: JSON.stringify({ ...link, userId: user?.id }),
     })
-    await prisma.links.create({
-      data: {
-        slug,
-        redirectTo,
-        userId: user?.id || '',
-      },
-    })
+    const { message }: IResponse = await res.json()
+    setLink(initialStateLink)
+    return alert(message)
   }
 
   return (
-    <form action={createLink}>
-      <FormControl className="flex flex-col max-w-96">
+    <form action={createLink} className="w-full">
+      <FormControl className="flex flex-col">
         <Box className="flex items-center">
           <Text fontSize="2xl">fewl.ink/</Text>
-          <Input className="ml-2" type="text" id="slug" name="slug" required />
+          <Input
+            onChange={handleChange}
+            className="ml-2"
+            type="text"
+            id="slug"
+            name="slug"
+            required
+            value={link.slug}
+          />
         </Box>
         <FormLabel className="mt-4" htmlFor="redirectTo">
           Redirecionar para:
         </FormLabel>
-        <Input type="url" id="redirectTo" name="redirectTo" required />
+        <Input
+          onChange={handleChange}
+          type="url"
+          id="redirectTo"
+          name="redirectTo"
+          required
+          value={link.redirectTo}
+        />
         <Button className="mt-6" type="submit">
           Criar Link
         </Button>
