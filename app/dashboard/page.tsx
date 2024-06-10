@@ -1,5 +1,12 @@
 'use client'
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Button,
   Table,
   TableContainer,
   Tbody,
@@ -8,14 +15,18 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from '@chakra-ui/react'
-import { useContext } from 'react'
+import React, { useContext } from 'react'
 import { FaTrash } from 'react-icons/fa'
 import { RefreshUserContext, UserContext } from '../providers/UserProvider'
 
 export default function Dashboard() {
   const user = useContext(UserContext)
   const { refreshUser, setRefreshUser } = useContext(RefreshUserContext)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const cancelRef = React.useRef()
+
   const deleteLink = async (linkId: string) => {
     const res = await fetch('/api/link', {
       body: JSON.stringify({ linkId }),
@@ -40,23 +51,58 @@ export default function Dashboard() {
             <Tbody>
               {user?.links.map((link) => {
                 return (
-                  <Tr key={link.id}>
-                    <Td>
-                      <a href={`http://${window.location.host}/${link.slug}`}>
-                        http://{window.location.host}/{link.slug}
-                      </a>
-                    </Td>
-                    <Td>
-                      <a href={link.redirectTo}>{link.redirectTo}</a>
-                    </Td>
-                    <Td isNumeric>{link._count.clicks}</Td>
-                    <Td isNumeric>
-                      <FaTrash
-                        className="hover:cursor-pointer hover:fill-red-800"
-                        onClick={() => deleteLink(link.id)}
-                      />
-                    </Td>
-                  </Tr>
+                  <>
+                    <Tr key={link.id}>
+                      <Td>
+                        <a href={`http://${window.location.host}/${link.slug}`}>
+                          http://{window.location.host}/{link.slug}
+                        </a>
+                      </Td>
+                      <Td>
+                        <a href={link.redirectTo}>{link.redirectTo}</a>
+                      </Td>
+                      <Td isNumeric>{link._count.clicks}</Td>
+                      <Td isNumeric>
+                        <FaTrash
+                          className="hover:cursor-pointer hover:fill-red-600"
+                          onClick={onOpen}
+                        />
+                      </Td>
+                    </Tr>
+                    <AlertDialog
+                      isOpen={isOpen}
+                      leastDestructiveRef={cancelRef}
+                      onClose={onClose}
+                    >
+                      <AlertDialogOverlay>
+                        <AlertDialogContent>
+                          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Excluir Link
+                          </AlertDialogHeader>
+
+                          <AlertDialogBody>
+                            Tem certeza que deseja excluir este link? Esta ação
+                            não poderá ser desfeita.
+                          </AlertDialogBody>
+
+                          <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                              Cancelar
+                            </Button>
+                            <Button
+                              colorScheme="red"
+                              onClick={() => {
+                                deleteLink(link.id)
+                              }}
+                              ml={3}
+                            >
+                              Excluir
+                            </Button>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialogOverlay>
+                    </AlertDialog>
+                  </>
                 )
               })}
             </Tbody>
