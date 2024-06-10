@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react'
 
-interface ILinks extends Links {
+export interface ILinks extends Links {
   _count: { clicks: number }
 }
 
@@ -18,6 +18,9 @@ interface IUser extends User {
   links: ILinks[]
 }
 
+export const SetUserContext = createContext<
+  Dispatch<SetStateAction<IUser | null>>
+>(() => {})
 export const UserContext = createContext<IUser | null>(null)
 export const RefreshUserContext = createContext<{
   refreshUser: boolean
@@ -50,9 +53,11 @@ export default function UserProvider({
 
   return (
     <UserContext.Provider value={user}>
-      <RefreshUserContext.Provider value={{ refreshUser, setRefreshUser }}>
-        {children}
-      </RefreshUserContext.Provider>
+      <SetUserContext.Provider value={setUser}>
+        <RefreshUserContext.Provider value={{ refreshUser, setRefreshUser }}>
+          {children}
+        </RefreshUserContext.Provider>
+      </SetUserContext.Provider>
     </UserContext.Provider>
   )
 }

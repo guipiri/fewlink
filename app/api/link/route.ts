@@ -1,4 +1,6 @@
 import { prisma } from '@/app/lib/prisma'
+import { ILinks } from '@/app/providers/UserProvider'
+import { IResponse } from '@/app/types/IResponse'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
@@ -46,5 +48,50 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json(response)
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const userId = searchParams.get('userId')
+  const initialDate = searchParams.get('initialDate')
+  const finalDate = searchParams.get('finalDate')
+  if (!userId) {
+    return NextResponse.json({
+      success: false,
+      message: 'Id do usuário é necessário para esta operação!',
+    })
+  }
+  if (!(initialDate && finalDate))
+    return NextResponse.json({
+      success: true,
+      message: 'sem final date',
+    })
+  console.log([initialDate, finalDate])
+
+  const init = new Date(initialDate)
+  const final = new Date(finalDate)
+  console.log([init, final])
+
+  try {
+    const links = await prisma.links.findMany({
+      where: { userId },
+      include: {
+        _count: {
+          select: {
+            clicks: {
+              where: { createdAt: { gte: init, lte: final } },
+            },
+          },
+        },
+      },
+    })
+    return NextResponse.json<IResponse<ILinks[]>>({
+      success: true,
+      data: links,
+    })
+  } catch (error: any) {
+    let response = { success: false, message: error.message }
+    return NextResponse.json<IResponse>(response)
   }
 }
