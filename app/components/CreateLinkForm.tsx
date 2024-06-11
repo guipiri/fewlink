@@ -1,12 +1,5 @@
 'use client'
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Text,
-} from '@chakra-ui/react'
+import { Button, FormControl, Input } from '@chakra-ui/react'
 import { Links } from '@prisma/client'
 import { ChangeEvent, useContext, useState } from 'react'
 import { RefreshUserContext, UserContext } from '../providers/UserProvider'
@@ -42,8 +35,8 @@ export default function CreateLinkForm() {
 
   return (
     <form action={createLink} className="w-full">
-      <FormControl className="flex flex-col">
-        <Box className="flex items-center">
+      <FormControl className="flex">
+        {/* <Box className="flex items-center">
           <Text fontSize="2xl">fewl.ink/</Text>
           <Input
             onChange={handleChange}
@@ -54,20 +47,20 @@ export default function CreateLinkForm() {
             required
             value={link.slug}
           />
-        </Box>
-        <FormLabel className="mt-4" htmlFor="redirectTo">
+        </Box> */}
+        {/* <FormLabel className="mt-4" htmlFor="redirectTo">
           Redirecionar para:
-        </FormLabel>
+        </FormLabel> */}
         <Input
           onChange={handleChange}
           type="url"
           id="redirectTo"
           name="redirectTo"
-          required
+          placeholder="URL a ser encurtada..."
           value={link.redirectTo}
         />
-        <Button className="mt-6" type="submit">
-          Criar Link
+        <Button ml="1rem" type="submit">
+          +
         </Button>
       </FormControl>
     </form>

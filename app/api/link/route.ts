@@ -1,10 +1,30 @@
 import { prisma } from '@/app/lib/prisma'
 import { ILinks } from '@/app/providers/UserProvider'
 import { IResponse } from '@/app/types/IResponse'
+import { generateRandomSlug } from '@/app/utils/generateRandomSlug'
+import { Links } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const data = await req.json()
+  const data: Omit<Links, 'createdAt' | 'updatedAt' | 'id'> = await req.json()
+
+  if (!data) {
+    return NextResponse.json({
+      success: false,
+      message: 'Solicitação mal-formada!',
+    })
+  }
+
+  if (!data.userId) {
+    return NextResponse.json({
+      success: false,
+      message: 'Faça login primeiro!',
+    })
+  }
+
+  if (!data.slug) {
+    data.slug = generateRandomSlug()
+  }
 
   try {
     await prisma.links.create({ data })

@@ -51,6 +51,7 @@ export default function Dashboard() {
     const json = await res.json()
     alert(`${json.message}`)
     setRefreshUser(!refreshUser)
+    onClose()
   }
 
   const getLinks = async () => {
@@ -74,16 +75,16 @@ export default function Dashboard() {
   return (
     <>
       {user && (
-        <Container
-          mt="2rem"
-          bgColor="HighlightTexts"
-          rounded="1rem"
-          padding="1rem"
-        >
+        <Container mt="2rem" width="100%" maxWidth={'50rem'}>
           <Text fontSize="1.5rem" textAlign="center">
             Dashboard
           </Text>
-          <Flex justifyContent="space-between" mt="1rem" alignItems="flex-end">
+          <Flex
+            justifyContent="space-between"
+            mt="1rem"
+            alignItems="flex-end"
+            wrap="wrap"
+          >
             <Box mr=".5rem">
               <label htmlFor="initialDate">De:</label>
               <Input
@@ -114,40 +115,37 @@ export default function Dashboard() {
             <Table variant="simple" fontSize=".8rem">
               <Thead>
                 <Tr>
-                  <Th>Link</Th>
-                  <Th>Destino</Th>
+                  <Th>Link Encurtado</Th>
+                  <Th>URL Original</Th>
                   <Th isNumeric>Cliques</Th>
+                  <Th></Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {user?.links.map((link) => {
                   return (
-                    <>
-                      <Tr key={link.id}>
-                        <Td>
-                          <a
-                            href={`http://${window.location.host}/${link.slug}`}
-                          >
-                            http://{window.location.host}/{link.slug}
-                          </a>
-                        </Td>
-                        <Td>
-                          <a href={link.redirectTo}>{link.redirectTo}</a>
-                        </Td>
-                        <Td isNumeric>{link._count.clicks}</Td>
-                        <Td isNumeric>
-                          <FaTrash
-                            className="hover:cursor-pointer hover:fill-red-600"
-                            onClick={onOpen}
-                          />
-                        </Td>
-                      </Tr>
+                    <Tr key={link.slug}>
+                      <Td>
+                        <a href={`http://${window.location.host}/${link.slug}`}>
+                          http://{window.location.host}/{link.slug}
+                        </a>
+                      </Td>
+                      <Td>
+                        <a href={link.redirectTo}>{link.redirectTo}</a>
+                      </Td>
+                      <Td isNumeric>{link._count.clicks}</Td>
+                      <Td padding={'0'}>
+                        <FaTrash
+                          className="hover:cursor-pointer hover:fill-red-600"
+                          onClick={onOpen}
+                        />
+                      </Td>
                       <AlertDialog
                         isOpen={isOpen}
                         leastDestructiveRef={cancelRef}
                         onClose={onClose}
                       >
-                        <AlertDialogOverlay>
+                        <AlertDialogOverlay bgColor="var(--chakra-colors-blackAlpha-400)">
                           <AlertDialogContent>
                             <AlertDialogHeader fontSize="lg" fontWeight="bold">
                               Excluir Link
@@ -175,7 +173,7 @@ export default function Dashboard() {
                           </AlertDialogContent>
                         </AlertDialogOverlay>
                       </AlertDialog>
-                    </>
+                    </Tr>
                   )
                 })}
               </Tbody>

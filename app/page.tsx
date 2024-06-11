@@ -1,5 +1,5 @@
 'use client'
-import { Button } from '@chakra-ui/react'
+import { Button, Flex } from '@chakra-ui/react'
 import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -12,29 +12,26 @@ export default function Home() {
   const user = useContext(UserContext)
   const router = useRouter()
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="max-w-2xl w-full">
-        <nav className="flex justify-between mb-8">
-          {user && (
-            <>
-              <Image
-                src={user?.image || ''}
-                alt="profile-image"
-                width={50}
-                height={50}
-              />
-              <h1>Olá {user?.name}</h1>
-            </>
-          )}
-          <Button
-            onClick={() => (user ? signOut() : router.push('/api/auth/signin'))}
-          >
-            {user ? 'Logout' : 'Login'}
-          </Button>
-        </nav>
+    <>
+      <Flex alignItems="center" justifyContent="space-between" margin="1rem">
+        {user && (
+          <Image
+            src={user?.image || ''}
+            alt="profile-image"
+            width={50}
+            height={50}
+            className="mr-4"
+          />
+        )}
         <CreateLinkForm />
-        {user?.links && user?.links.length > 0 && <Dashboard />}
-      </div>
-    </div>
+        <Button
+          ml="1rem"
+          onClick={() => (user ? signOut() : router.push('/api/auth/signin'))}
+        >
+          {user ? 'Logout' : 'Login'}
+        </Button>
+      </Flex>
+      {user?.links && user?.links.length > 0 && <Dashboard />}
+    </>
   )
 }
