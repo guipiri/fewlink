@@ -10,7 +10,7 @@ export async function postClick(
   const country = req.headers.get('x-vercel-ip-country') || 'undefined'
   const region = req.headers.get('x-vercel-ip-country-region') || 'undefined'
   const city = req.headers.get('x-vercel-ip-city') || 'undefined'
-  console.log(`postClick-headers: ${ip}, ${country}, ${city}, ${region}`)
+  console.log(`postClick-headers: ${ip}, ${country}, ${city}, ${region}.`)
 
   const {
     browser: { name: browser },
