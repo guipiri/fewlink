@@ -85,13 +85,11 @@ export async function GET(req: NextRequest) {
   if (!(initialDate && finalDate))
     return NextResponse.json({
       success: true,
-      message: 'sem final date',
+      message: 'Datas necessárias!',
     })
-  console.log([initialDate, finalDate])
 
   const init = new Date(initialDate)
   const final = new Date(finalDate)
-  console.log([init, final])
 
   try {
     const links = await prisma.links.findMany({

@@ -32,6 +32,15 @@ CREATE TABLE "Links" (
 CREATE TABLE "Clicks" (
     "id" SERIAL NOT NULL,
     "linkId" TEXT NOT NULL,
+    "device" TEXT NOT NULL,
+    "browser" TEXT NOT NULL,
+    "isBot" BOOLEAN NOT NULL,
+    "os" TEXT NOT NULL,
+    "continent" TEXT NOT NULL,
+    "country" TEXT NOT NULL,
+    "region" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "ip" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Clicks_pkey" PRIMARY KEY ("id")
