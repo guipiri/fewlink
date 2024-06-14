@@ -10,7 +10,7 @@ export function middleware(req: NextRequest) {
   const country = geo?.country || 'undefined'
   const city = geo?.city || 'undefined'
   const region = geo?.region || 'undefined'
-  console.log(`middleware-geo-obj: ${geo}`)
+  console.log(`middleware-geo-obj: ${JSON.stringify(geo)}`)
 
   url.searchParams.set('country', country)
   url.searchParams.set('city', city)

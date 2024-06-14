@@ -6,7 +6,7 @@ export async function GET(
   req: NextRequest,
   { params: { slug } }: { params: { slug: string } }
 ) {
-  console.log(`route-GET-geo-obj: ${req.geo}`)
+  console.log(`route-GET-geo-obj: ${JSON.stringify(req.geo)}`)
   const res = await prisma.links.findUnique({
     select: { redirectTo: true, id: true },
     where: { slug },
